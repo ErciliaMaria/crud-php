@@ -1,0 +1,39 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link href="../css/form.css" rel="stylesheet" type="text/css" media="screen">
+</head>
+
+<body>
+    <form enctype="multipart/form-data" method="post" action="pessoa_form.php?action=save">
+        <label for="">Código</label>
+        <input name="id" readonly="1" type="text" value={id}>
+
+        <label for="">Nome</label>
+        <input name="nome" type="text" value={nome}>
+
+        <label for="">Endereço</label>
+        <input name="endereco" type="text" value={endereco}>
+
+        <label for="">Bairro</label>
+        <input name="bairro" type="text" value={bairro}>
+
+        <label for="">Telefone</label>
+        <input name="telefone" type="text" value={telefone}>
+
+        <label for="">Email</label>
+        <input name="email" type="text" value={email}>
+
+        <label for="">Cidade</label>
+        <select name="id_cidade">
+          {cidades}
+        </select>
+
+        <input type="submit">
+    </form>
+</body>
+
+</html>
