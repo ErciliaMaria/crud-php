@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de pessoas</title>
+    <link href="/css/list.css" rel="stylesheet" type="text/css" media="screen">
+</head>
+<body>
+    <table border=1>
+        <thead>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Id</td>
+                <td>Nome</td>
+                <td>Endereço</td>
+                <td>Bairro</td>
+                <td>Telefone</td>
+                <td>Email</td>
+            </tr>
+        </thead>
+        <tbody>
+            {items}
+        </tbody>
+    </table>
+
+    <button onclick="window.location='pessoa_form.php'">
+        <img src="/img/insert.jpg" alt="inserção">
+    </button>
+
+</body>
+</html>
