@@ -1,4 +1,7 @@
 <?php
+require_once 'classes/Pessoa.php';
+require_once 'classes/Cidade.php';
+
     $pessoa = [];
     $pessoa['id']        = '';
     $pessoa['nome']      = '';
@@ -9,65 +12,38 @@
     $pessoa['id_cidade'] = '';
 
     if (!empty($_REQUEST['action'])) {
-        $conn = new mysqli('localhost', 'root', '', 'cadastro_pessoa', 3306);
-
+    try
+        {
+        
         if ($_REQUEST['action'] === 'edit') {
             if (!empty($_GET['id'])) {
                 $id = (int) $_GET['id'];
-                $result = $conn->query("SELECT * FROM pessoas WHERE id='{$id}'");
 
-                $pessoa = $result->fetch_assoc();
+                $pessoa = Pessoa::find($id);
             }
         } else if ($_REQUEST['action'] === 'save') {
             $id = $_POST['id'];
             $pessoa = $_POST;
 
-            if (empty($_POST['id'])) {
-                $dados = $_POST;
-
-                $result = $conn->query('SELECT MAX(id) as next FROM pessoas');
-
-                $row = $result->fetch_assoc();
-                $next = (int) $row['next'] + 1;
-
-                $sql = "INSERT INTO pessoas(id, nome, endereco, bairro, telefone, email,id_cidade)
-                VALUES ('{$next}',  '{$pessoa['nome']}', 
-                                    '{$pessoa['endereco']}', 
-                                    '{$pessoa['bairro']}', 
-                                    '{$pessoa['telefone']}',
-                                    '{$pessoa['email']}', 
-                                    '{$pessoa['id_cidade']}')";
-                $result = mysqli_query($conn, $sql);
-
-                if ($result) {
-                    print "Registro inserido com sucesso!";
-                } else {
-                    print "Erro ao inserir: " . mysqli_error($conn);
-                }
-                $conn->close();
-            } else {
-                $dados = $_POST;
-
-                $conn = new mysqli('localhost', 'root', '', 'cadastro_pessoa', 3306);
-
-                $sql = "UPDATE pessoas SET nome     = '{$pessoa['nome']}',
-                               endereco = '{$pessoa['endereco']}',
-                               bairro   = '{$pessoa['bairro']}',
-                               telefone = '{$pessoa['telefone']}',
-                               email    = '{$pessoa['email']}',
-                              id_cidade = '{$pessoa['id_cidade']}'
-                           WHERE id = '{$pessoa['id']}'
-                        ";
-                $result = $conn->query($sql);
-
-                print ($result) ? 'Registro atualizado com sucesso' : print mysqli_error($conn);
-            
-                $conn->close();
-            }
+            Pessoa::save($pessoa);
+        
+            print 'Registro salvo com sucesso';
         }
+    }catch(Exception $e){
+        print $e->getMessage();
     }
-    require_once 'lista_combo_cidades.php';
-    $cidades = lista_combo_cidades($pessoa['id_cidade']);
+}
+    $cidades = '';
+    
+    foreach(Cidade::all() as $cidade)
+    {
+        $id = $cidade['id'];
+        $nome = $cidade['nome'];
+      
+        $check = ($cidade['id'] == $pessoa['id_cidade']) ? 'selected = 1' : ' ';
+      
+        $cidades .= "<option value='{$id}' {$check} >{$nome}</option>";
+    }
 
     $form = file_get_contents('html/form.html');
     $form = str_replace('{id}', $pessoa['id'], $form);

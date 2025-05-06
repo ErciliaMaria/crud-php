@@ -1,27 +1,32 @@
 <?php
-$conn = new mysqli('localhost', 'root', '', 'cadastro_pessoa', 3306);
+require_once 'classes/Pessoa.php';
 
-if( !empty($_GET['action']) and ($_GET['action'] == 'delete'))
-{
-    $id = (int) $_GET['id'];
+try{
+        if( !empty($_GET['action']) and ($_GET['action'] == 'delete'))
+    {
 
-    $conn->query("DELETE FROM pessoas WHERE id='{$id}'");
-}
-            
-$result = $conn->query('SELECT * FROM pessoas ORDER BY id');
+        $id = (int) $_GET['id'];
+    Pessoa::delete($id);
 
+    }
+        $pessoas = Pessoa::all();
+    }catch(Exception){
+        print $e->getMessage();
+    }
 $items = '';
-while ($row = $result->fetch_assoc())
-{
-    $item = file_get_contents('html/item.html');
-    $item = str_replace('{id}', $row['id'], $item);
-    $item = str_replace('{nome}', $row['nome'], $item);
-    $item = str_replace('{endereco}', $row['endereco'], $item);
-    $item = str_replace('{bairro}', $row['bairro'], $item);
-    $item = str_replace('{telefone}', $row['telefone'], $item);
-    $item = str_replace('{email}', $row['email'], $item);
+if($pessoas){
+    foreach($pessoas as $pessoa)
+    {
+        $item = file_get_contents('html/item.html');
+        $item = str_replace('{id}', $pessoa['id'], $item);
+        $item = str_replace('{nome}', $pessoa['nome'], $item);
+        $item = str_replace('{endereco}', $pessoa['endereco'], $item);
+        $item = str_replace('{bairro}', $pessoa['bairro'], $item);
+        $item = str_replace('{telefone}', $pessoa['telefone'], $item);
+        $item = str_replace('{email}', $pessoa['email'], $item);
 
-    $items .= $item;
+        $items .= $item;
+    }
 }
 
 $list = file_get_contents('html/list.html');
