@@ -2,13 +2,21 @@
 
 class Pessoa
 {
+    private static $conn;
+
     private static function connect()
     {
-        $conn = new mysqli('localhost', 'root', '', 'cadastro_pessoa', 3306);
-        if ($conn->connect_error) {
-            die("Erro de conexão: " . $conn->connect_error);
+        if(empty(self::$conn)){
+            $ini = parse_ini_file('config/livro.ini');
+            $host = $ini['host'];
+            $name = $ini['name'];
+            $user = $ini['user'];
+            $pass = $ini['password'];
+            self::$conn = new mysqli($host, $user, $pass, $name, 3306);        if (self::$conn->connect_error) {
+            die("Erro de conexão: " . self::$conn->connect_error);
         }
-        return $conn;
+        return self::$conn;
+        }
     }
 
     public static function find($id)
@@ -20,7 +28,6 @@ class Pessoa
         $result = $stmt->get_result();
         $pessoa = $result->fetch_assoc();
         $stmt->close();
-        $conn->close();
         return $pessoa;
     }
 
@@ -31,7 +38,6 @@ class Pessoa
         $stmt->bind_param("i", $id);
         $success = $stmt->execute();
         $stmt->close();
-        $conn->close();
         return $success;  
     }
 
@@ -43,7 +49,6 @@ class Pessoa
         $result = $stmt->get_result();
         $list = $result->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
-        $conn->close();
         return $list;
     }
 
