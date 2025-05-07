@@ -10,7 +10,7 @@ try{
 
     }
         $pessoas = Pessoa::all();
-    }catch(Exception){
+    }catch(Exception $e){
         print $e->getMessage();
     }
 $items = '';
