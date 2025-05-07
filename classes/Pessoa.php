@@ -15,15 +15,15 @@ class Pessoa
             self::$conn = new mysqli($host, $user, $pass, $name, 3306);        if (self::$conn->connect_error) {
             die("Erro de conexão: " . self::$conn->connect_error);
         }
-        return self::$conn;
         }
+        return self::$conn;
     }
 
     public static function find($id)
     {
         $conn = self::connect();
         $stmt = $conn->prepare("SELECT * FROM pessoas WHERE id = ?");
-        $stmt->bind_param("i", $id);
+        $stmt->bind_param("i", $id); 
         $stmt->execute();
         $result = $stmt->get_result();
         $pessoa = $result->fetch_assoc();
@@ -47,9 +47,15 @@ class Pessoa
         $stmt = $conn->prepare("SELECT * FROM pessoas ORDER BY id");
         $stmt->execute();
         $result = $stmt->get_result();
-        $list = $result->fetch_all(MYSQLI_ASSOC);
+    
+        $pessoas = [];
+        while ($row = $result->fetch_assoc()) {
+            $pessoas[] = $row;
+        }
+    
         $stmt->close();
-        return $list;
+        $conn->close();
+        return $pessoas;
     }
 
     public static function save($pessoa)
@@ -57,34 +63,50 @@ class Pessoa
         $conn = self::connect();
         if(empty($pessoa['id'])){
             $result = $conn->query("SELECT max(id) as next FROM pessoas");
-
+            
             $row = $result->fetch_assoc();
-
             $pessoa['id'] = $row['next'] + 1;
 
-            $sql = "INSERT INTO pessoas(id, nome, endereco, bairro, telefone, email,id_cidade)
-            VALUES ('{$pessoa['id']}',  '{$pessoa['nome']}', 
-                                '{$pessoa['endereco']}', 
-                                '{$pessoa['bairro']}', 
-                                '{$pessoa['telefone']}',
-                                '{$pessoa['email']}', 
-                                '{$pessoa['id_cidade']}')";
+            $sql = "INSERT INTO pessoas (nome, endereco, bairro, telefone, email, id_cidade)
+                VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param(
+                "sssssi",
+                $pessoa['nome'],
+                $pessoa['endereco'],
+                $pessoa['bairro'],
+                $pessoa['telefone'],
+                $pessoa['email'],
+                $pessoa['id_cidade']
+            );
+            $success = $stmt->execute();
+            $stmt->close();
+            $conn->close();
+            return $success;
 
         }else
         {
-            $sql = "UPDATE pessoas SET nome     = '{$pessoa['nome']}',
-            endereco = '{$pessoa['endereco']}',
-            bairro   = '{$pessoa['bairro']}',
-            telefone = '{$pessoa['telefone']}',
-            email    = '{$pessoa['email']}',
-           id_cidade = '{$pessoa['id_cidade']}'
-        WHERE id = '{$pessoa['id']}'
+            $sql = "UPDATE pessoas SET nome     = ?,
+            endereco = ?,
+            bairro   = ?,
+            telefone = ?,
+            email    = ?,
+           id_cidade = ?
+        WHERE id = ?
         ";
-        
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param(
+                "ssssssi", 
+                $pessoa['nome'],
+                $pessoa['endereco'],
+                $pessoa['bairro'],
+                $pessoa['telefone'],
+                $pessoa['email'],
+                $pessoa['id_cidade'],
+                $pessoa['id'] 
+            );
+            $success = $stmt->execute();
+            return $success;
         }
-        $result = $conn->query($sql);
-        $conn->close();
-
-        return $result;
     }
 }
