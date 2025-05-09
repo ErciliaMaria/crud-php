@@ -47,14 +47,12 @@ class Pessoa
         $stmt = $conn->prepare("SELECT * FROM pessoas ORDER BY id");
         $stmt->execute();
         $result = $stmt->get_result();
-    
         $pessoas = [];
         while ($row = $result->fetch_assoc()) {
             $pessoas[] = $row;
         }
     
         $stmt->close();
-        $conn->close();
         return $pessoas;
     }
 
@@ -81,7 +79,6 @@ class Pessoa
             );
             $success = $stmt->execute();
             $stmt->close();
-            $conn->close();
             return $success;
 
         }else
@@ -106,6 +103,7 @@ class Pessoa
                 $pessoa['id'] 
             );
             $success = $stmt->execute();
+            $stmt->close();
             return $success;
         }
     }
